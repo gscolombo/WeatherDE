@@ -1,8 +1,13 @@
 from prefect import flow, task
 from os import getenv
 from dotenv import load_dotenv
-from src.data_ingestion.locals import _locals
 from requests import get
+import json
+from datetime import datetime
+
+from data_ingestion.locals import _locals
+from s3 import S3Client
+
 
 load_dotenv()
 
@@ -26,13 +31,7 @@ def get_coords():
             data.append(*res.json())
             continue
 
-    return {
-        d["name"]: {
-            "lat": d["lat"],
-            "lon": d["lon"]
-        }
-        for d in data
-    }
+    return [(d["lat"], d["lon"]) for d in data]
 
 
 @task
@@ -47,14 +46,15 @@ def fetch_api(coords: dict):
 
 
 @task
-def upload_data():
-    pass
+def upload_data(data: list):
+    t = int(datetime.now().timestamp())
+    s3_client = S3Client()
+
+    enc_data = json.dumps(data).encode('utf-8')
+    fname = f"weather@{t}"
+    s3_client.put_object(getenv("BUCKET_NAME"), fname, enc_data)
 
 
 @flow
 def data_ingestion():
-    pass
-
-
-if __name__ == "__main__":
-    data_ingestion()
+    upload_data(fetch_api(get_coords()))
