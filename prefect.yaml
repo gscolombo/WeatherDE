@@ -1,0 +1,25 @@
+# Generic metadata about this project
+name: weatherde
+prefect-version: 3.4.14
+
+# pull section allows you to provide instructions for cloning this project in remote locations
+pull:
+- prefect.deployments.steps.git_clone:
+  id: clone-repo
+  repository: https://github.com/gscolombo/WeatherDE.git
+- prefect.deployments.steps.pip_install_requirements:
+  directory: "{{ clone-repo.directory }}"
+  requirements_file: requirements.txt
+
+# the deployments section allows you to provide configuration for deploying flows
+deployments:
+- name: data-ingestion
+  version: "1.0.0"
+  entrypoint: src/main.py:data_ingestion
+  work_pool:
+    name: data_ingestion_managed
+  schedules:
+  - interval: 600.0
+    anchor_date: '2025-08-22T23:07:56.912482+00:00'
+    timezone: UTC
+    active: true
