@@ -9,13 +9,13 @@ pull:
     repository: https://github.com/gscolombo/WeatherDE.git
     branch: main
 - prefect.deployments.steps.pip_install_requirements:
-    directory: "{{ clone-repo.directory }}"
+    directory: "{{ clone-repo.directory }}/data_ingestion"
     requirements_file: requirements.txt
 
 # the deployments section allows you to provide configuration for deploying flows
 deployments:
 - name: data-ingestion
-  version: "1.0.0"
+  version: "1.0.1"
   entrypoint: src/main.py:data_ingestion
   work_pool:
     name: data_ingestion_managed
