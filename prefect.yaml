@@ -7,7 +7,7 @@ pull:
 - prefect.deployments.steps.git_clone:
     id: clone-repo
     repository: https://github.com/gscolombo/WeatherDE.git
-    branch: main
+    branch: new_architecture
 - prefect.deployments.steps.pip_install_requirements:
     directory: "{{ clone-repo.directory }}/src/data_ingestion"
     requirements_file: requirements.txt
@@ -15,16 +15,15 @@ pull:
 # the deployments section allows you to provide configuration for deploying flows
 deployments:
 - name: data-ingestion
-  version: "1.0.1"
+  version: "1.1.0"
   entrypoint: src/main.py:data_ingestion
   work_pool:
     name: data_ingestion_managed
     job_variables:
       env:
         OPENWEATHER_APPID: "{{ $OPENWEATHER_APPID }}"
-        AWS_ACCESS_KEY_ID: "{{ $AWS_ACCESS_KEY_ID }}"
-        AWS_SECRET_ACCESS_KEY: "{{ $AWS_SECRET_ACCESS_KEY}}"
-        BUCKET_NAME: "{{ $BUCKET_NAME }}"
+        MONGODB_DBNAME: "{{ $MONGODB_DBNAME }}"
+        MONGODB_SERVER_URI: "{{ $MONGODB_SERVER_URI}}"
   schedules:
   - interval: 600.0
     anchor_date: '2025-08-22T23:07:56.912482+00:00'

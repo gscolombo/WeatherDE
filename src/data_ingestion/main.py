@@ -2,16 +2,17 @@ from prefect import flow, task
 from os import getenv
 from dotenv import load_dotenv
 from requests import get
-import json
-from datetime import datetime
+from datetime import datetime as dt
 
-from data_ingestion.locals import _locals
-from s3 import S3Client
+from models import FullWeatherData
+from cities import cities
 
+from timeseries import TimeSeries
 
 load_dotenv()
 
 API_KEY = getenv("OPENWEATHER_APPID")
+TTL = 60 * 60 * 24 * 31  # Number of seconds in 31 days
 
 
 def GEOCODING_API_URL(city, country):
@@ -22,10 +23,14 @@ def CURRENTWEATHER_API_URL(lat: float, lon: float):
     return f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&units=metric&appid={API_KEY}"
 
 
+coordinates = tuple[float, float]
+
+
 @task
-def get_coords():
+def get_coords() -> list[coordinates]:
     data = []
-    for city, country in _locals:
+    for city, country in cities:
+        print(f"Getting coordinates for {city} ({country})...")
         res = get(GEOCODING_API_URL(city, country))
         if (res.ok):
             data.append(*res.json())
@@ -35,9 +40,10 @@ def get_coords():
 
 
 @task
-def fetch_api(coords: dict):
+def fetch_api(coords: list[coordinates]):
     data = []
     for lat, lon in coords:
+        print(f"Retrieving weather data of coordinates {lat}, {lon}")
         res = get(CURRENTWEATHER_API_URL(lat, lon))
         if (res.ok):
             data.append(res.json())
@@ -46,13 +52,21 @@ def fetch_api(coords: dict):
 
 
 @task
-def upload_data(data: list):
-    t = int(datetime.now().timestamp())
-    s3_client = S3Client()
+def upload_data(data: list[FullWeatherData]):
+    c = TimeSeries("weather-ts",
+                   timeseries={"timeField": "dt",
+                               "metaField": "coord",
+                               "granularity": "minutes"},
+                   expireAfterSeconds=TTL)
 
-    enc_data = json.dumps(data).encode('utf-8')
-    fname = f"weather@{t}"
-    s3_client.put_object(getenv("BUCKET_NAME"), fname, enc_data)
+    # Convert UNIX timestamp to datetime objects
+    for d in data:
+        d["dt"] = dt.fromtimestamp(d["dt"])
+
+    res = c.insert(data, FullWeatherData)
+
+    if res.acknowledged:
+        print(f"{len(res.inserted_ids)} entries inserted.")
 
 
 @flow
