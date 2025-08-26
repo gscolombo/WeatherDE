@@ -2,4 +2,3 @@ prefect
 python-dotenv
 boto3
 pymongo[srv]
-pydantic
