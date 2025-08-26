@@ -5,7 +5,7 @@ views = {
         {
             "$group": {
                 "_id": {
-                    "lat": {"$trunc": ["$coord.lat", 2]}, "lon": {"$trunc": ["$coord.lon", 2]}
+                    "lat": {"$trunc": ["$coord.lat", 1]}, "lon": {"$trunc": ["$coord.lon", 1]}
                 },
                 "dt": {"$last": "$dt"},
                 "main": {"$last": "$main"},

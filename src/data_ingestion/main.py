@@ -4,10 +4,10 @@ from dotenv import load_dotenv
 from requests import get
 from datetime import datetime as dt
 
-from models import FullWeatherData
-from cities import cities
+from shared.models import FullWeatherData
+from shared.cities import cities
 
-from timeseries import TimeSeries
+from shared.timeseries import TimeSeries
 
 load_dotenv()
 

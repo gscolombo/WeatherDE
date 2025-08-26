@@ -1,6 +1,7 @@
 import argparse
+import subprocess
 
-from view import View
+from shared.view import View
 from data_processing.views import views
 from data_ingestion.main import data_ingestion
 
@@ -18,6 +19,7 @@ def prompt_user(message: str, options: list[str]):
 
 
 if __name__ == "__main__":
+
     parser = argparse.ArgumentParser(
         description="Command-line utility to run specific tasks for the WeatherDE project."
     )
@@ -25,6 +27,7 @@ if __name__ == "__main__":
     parser.add_argument("--run-data-ingestion",
                         help="Run data ingestion pipeline",
                         action="store_true")
+
     parser.add_argument("--create-views",
                         help='Run "src/data_processing/views.py" script',
                         action="store_true")

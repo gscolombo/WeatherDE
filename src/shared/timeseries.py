@@ -1,7 +1,6 @@
-from pymongo.collection import Collection
 from typing import Literal, TypedDict
 
-from collection import _Collection
+from shared.collection import _Collection
 
 
 class TimeSeriesOptions(TypedDict):

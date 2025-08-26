@@ -1,16 +1,20 @@
 from pymongo.collection import Collection
 from typing import Iterable, Callable
 
-from db import DB
+from shared.db import DB
 
 
 class _Collection(DB):
     name: str
     collection: Collection
 
-    def __init__(self, name, **kwargs):
-        super().__init__()
+    def __init__(self, name, db: DB = None, **kwargs):
         self.name = name
+        if db is None:
+            super().__init__()  # Initialize new instance of DB
+        else:
+            self._db = db._db
+
         if not name in self._db.list_collection_names():
             print(f"Creating collection {name}...")
             self.collection = self._db.create_collection(name, **kwargs)

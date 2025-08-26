@@ -1,4 +1,4 @@
-from db import DB
+from shared.db import DB
 
 
 class View(DB):
