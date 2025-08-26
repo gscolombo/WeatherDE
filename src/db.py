@@ -11,5 +11,7 @@ class DB:
     _db: Database
 
     def __init__(self):
+        print("Setting MongoDB client...")
         self.__mongo_client = MongoClient(getenv("MONGODB_SERVER_URI"))
+        print("Database is connected.")
         self._db = self.__mongo_client[getenv("MONGODB_DBNAME")]
