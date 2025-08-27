@@ -1,9 +1,12 @@
 import streamlit as st
 import pydeck as pdk
 from datetime import timedelta
+from os import environ
+
+for secret in st.secrets:
+    environ[secret] = st.secrets[secret]
 
 from app.main import data
-
 
 st.title("Painel do clima")
 

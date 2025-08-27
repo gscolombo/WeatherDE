@@ -1,13 +1,11 @@
 import streamlit as st
 import pandas as pd
-from os import getenv
-from dotenv import load_dotenv
 from requests import get
+from os import getenv
+
 
 from shared.db import DB
 from shared.collection import _Collection
-
-load_dotenv()
 
 
 def REVERSE_GEOCODING_API_URL(lat: float, lon: float):
