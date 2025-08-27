@@ -34,7 +34,6 @@ def get_coords() -> list[coordinates]:
         res = get(GEOCODING_API_URL(city, country))
         if (res.ok):
             data.append(*res.json())
-            continue
 
     return [(d["lat"], d["lon"]) for d in data]
 
