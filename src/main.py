@@ -1,5 +1,4 @@
 import argparse
-import subprocess
 
 from shared.view import View
 from data_processing.views import views
